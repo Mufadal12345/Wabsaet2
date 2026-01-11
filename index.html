@@ -1,300 +1,0 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>متحف الفكر - عرض إقناعي</title>
-    <!-- تضمين Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* خط Inter هو خط Tailwind الافتراضي، لكن نضمن الخطوط العربية الجيدة */
-        :root {
-            --color-primary: #1e3a8a; /* Indigo Dark */
-            --color-accent: #fcd34d;  /* Gold/Amber */
-            --color-text: #f3f4f6;    /* Light Gray */
-            --color-bg: #0f172a;      /* Dark Navy/Slate */
-        }
-        body {
-            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
-            background-color: var(--color-bg);
-            color: var(--color-text);
-            overflow: hidden; /* لمنع ظهور شريط التمرير الأفقي والرأسي */
-            transition: background-color 0.5s;
-        }
-        .slide {
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            position: absolute;
-            top: 0;
-            left: 0;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.7s ease-in-out, visibility 0.7s ease-in-out;
-            padding: 4rem;
-            text-align: center;
-        }
-        .slide.active {
-            opacity: 1;
-            visibility: visible;
-            z-index: 10;
-        }
-        .slide-content {
-            max-width: 80%;
-            margin: 0 auto;
-        }
-        .nav-button {
-            position: fixed;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 20;
-            padding: 1rem;
-            cursor: pointer;
-            background-color: rgba(30, 58, 138, 0.7); /* Primary with opacity */
-            color: white;
-            border: none;
-            font-size: 2rem;
-            border-radius: 0.5rem;
-            transition: background-color 0.3s, opacity 0.3s;
-        }
-        .nav-button:hover {
-            background-color: var(--color-primary);
-        }
-        #prevBtn { left: 1rem; }
-        #nextBtn { right: 1rem; }
-    </style>
-</head>
-<body>
-
-    <!-- زر التنقل السابق -->
-    <button id="prevBtn" class="nav-button opacity-70 hover:opacity-100">❮</button>
-    <!-- زر التنقل التالي -->
-    <button id="nextBtn" class="nav-button opacity-70 hover:opacity-100">❯</button>
-
-    <!-- الشريحة 1: الغلاف -->
-    <div id="slide-1" class="slide active bg-cover bg-center" style="background-color: var(--color-bg); background-image: url('http://googleusercontent.com/generated_image_content/0'); background-size: cover;">
-        <div class="slide-content bg-black bg-opacity-50 p-10 rounded-xl shadow-2xl">
-            <h1 class="text-6xl font-extrabold mb-4" style="color: var(--color-accent); text-shadow: 0 0 10px rgba(252, 211, 77, 0.8);">
-                🎨✨ متحف الفكر
-            </h1>
-            <h2 class="text-3xl font-light text-white">
-                حيث تولد الأفكار وتبقى خالدة
-            </h2>
-            <p class="mt-8 text-xl text-gray-300">
-                مبادرة لإثراء العقل والإبداع الجامعي.
-            </p>
-        </div>
-    </div>
-
-    <!-- الشريحة 2: لماذا هذا المشروع مهم؟ -->
-    <div id="slide-2" class="slide">
-        <div class="slide-content">
-            <h2 class="text-5xl font-bold mb-6" style="color: var(--color-accent);">🧭 لماذا هذا المشروع مهم؟</h2>
-            <div class="text-3xl font-light leading-relaxed max-w-4xl mx-auto">
-                <p class="mb-6">في كل طالب، هناك **عالم غير مكتشف**: فكرة عميقة، لوحة لم تُعرض، أو كلمة لم تجد من يسمعها.</p>
-                <p class="mb-6" style="color: var(--color-text);">متحف الفكر ليس مشروعًا عاديًا…</p>
-                <p class="text-4xl font-semibold" style="color: var(--color-primary);">إنه منصة **تصنع التاريخ الشخصي والفكري** لكل طالب.</p>
-                <p class="mt-4 text-xl">هنا، نُحوّل الأفكار الصامتة إلى **أثر خالد** داخل الجامعة.</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- الشريحة 3: ما هو متحف الفكر؟ -->
-    <div id="slide-3" class="slide">
-        <div class="slide-content">
-            <h2 class="text-5xl font-bold mb-12" style="color: var(--color-accent);">🏛️ ما هو متحف الفكر؟</h2>
-            
-            <p class="text-2xl mb-12">هو مساحة فكرية حرة داخل الجامعة — زاوية أو جدار أو قاعة — تجمع بين الفلسفة، الفن، والإبداع.</p>
-
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
-                <div class="p-6 rounded-lg shadow-xl" style="background-color: var(--color-primary);">
-                    <p class="text-4xl mb-3">✍️</p>
-                    <p class="text-xl font-medium">تأملاتهم وأفكارهم.</p>
-                </div>
-                <div class="p-6 rounded-lg shadow-xl" style="background-color: var(--color-primary);">
-                    <p class="text-4xl mb-3">🎨</p>
-                    <p class="text-xl font-medium">لوحاتهم ورسوماتهم الرمزية.</p>
-                </div>
-                <div class="p-6 rounded-lg shadow-xl" style="background-color: var(--color-primary);">
-                    <p class="text-4xl mb-3">💬</p>
-                    <p class="text-xl font-medium">اقتباساتهم ومقالاتهم القصيرة.</p>
-                </div>
-                <div class="p-6 rounded-lg shadow-xl" style="background-color: var(--color-primary);">
-                    <p class="text-4xl mb-3">📚</p>
-                    <p class="text-xl font-medium">أسئلتهم الوجودية ورسائلهم.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- الشريحة 4: ما الذي يجعل هذا المشروع مختلفًا؟ -->
-    <div id="slide-4" class="slide bg-white" style="color: #1f2937;">
-        <div class="slide-content">
-            <h2 class="text-5xl font-bold mb-12" style="color: var(--color-primary);">💡 ما الذي يجعل هذا المشروع مختلفًا؟</h2>
-            
-            <p class="text-2xl mb-12 font-medium">نحن لا نعرض الدرجات أو الشهادات، بل نُظهر ما يجعلنا بشرًا: التفكير، الإحساس، الإبداع.</p>
-
-            <div class="max-w-3xl mx-auto border-r-8 p-6 rounded-lg text-right" style="border-color: var(--color-accent); background-color: #f9fafb;">
-                <p class="text-4xl italic font-serif leading-snug">
-                    “أنت لست مجرد رقم جامعي، أنت فكرة تستحق أن تُخلّد.”
-                </p>
-                <p class="mt-4 text-xl font-semibold" style="color: var(--color-primary);">— رؤية متحف الفكر</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- الشريحة 5: الفائدة للمشاركين -->
-    <div id="slide-5" class="slide">
-        <div class="slide-content">
-            <h2 class="text-5xl font-bold mb-12" style="color: var(--color-accent);">🌿 ما الفائدة التي سيجنيها المشاركون؟</h2>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 text-left">
-                <!-- الشهرة الفكرية -->
-                <div class="bg-gray-700 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
-                    <p class="text-4xl mb-3">🏆</p>
-                    <h3 class="text-xl font-bold mb-2 text-white">الشهرة الفكرية</h3>
-                    <p class="text-sm text-gray-300">اسمك موقّعًا في “دفتر الذاكرة الفكرية” الذي سيبقى للأجيال.</p>
-                </div>
-                <!-- البوابة الأولى لأعمالك -->
-                <div class="bg-gray-700 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
-                    <p class="text-4xl mb-3">💼</p>
-                    <h3 class="text-xl font-bold mb-2 text-white">البوابة الأولى لأعمالك</h3>
-                    <p class="text-sm text-gray-300">مقالك، رسوماتك، أو أفكارك ستكون البداية لمسيرتك الإبداعية.</p>
-                </div>
-                <!-- مجتمع فكري حقيقي -->
-                <div class="bg-gray-700 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
-                    <p class="text-4xl mb-3">🤝</p>
-                    <h3 class="text-xl font-bold mb-2 text-white">مجتمع فكري حقيقي</h3>
-                    <p class="text-sm text-gray-300">تلتقي بعقول تشبهك، تناقش، وتترك أثرك في ذاكرة المكان.</p>
-                </div>
-                <!-- تجربة إنسانية فريدة -->
-                <div class="bg-gray-700 p-6 rounded-xl shadow-lg hover:shadow-xl transition duration-300">
-                    <p class="text-4xl mb-3">⏳</p>
-                    <h3 class="text-xl font-bold mb-2 text-white">تجربة إنسانية فريدة</h3>
-                    <p class="text-sm text-gray-300">ستعود بعد سنوات لتجد آثارك الفكرية باقية… تشهد على من كنت يومًا.</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- الشريحة 6: لماذا يجب أن تدعم هذا المشروع؟ -->
-    <div id="slide-6" class="slide">
-        <div class="slide-content max-w-4xl">
-            <h2 class="text-5xl font-bold mb-12" style="color: var(--color-accent);">🚀 لماذا يجب أن تدعم هذا المشروع؟</h2>
-            
-            <p class="text-3xl font-light mb-12 leading-relaxed">
-                لأنك حين تدعم متحف الفكر، فأنت لا تدعم ركنًا جامعيًا… بل تدعم فكرة أن **الإنسان يصنع أثره بالفكر لا بالمال**.
-            </p>
-            
-            <div class="border-t-4 border-b-4 py-8 px-6" style="border-color: var(--color-primary);">
-                <p class="text-4xl italic font-semibold leading-snug">
-                    "من يدعم الفكرة اليوم، سيُذكر غدًا بأنه ساهم في بناء ذاكرة الجامعة الفكرية الأولى."
-                </p>
-            </div>
-            <p class="mt-8 text-xl text-gray-400">
-                كل لوحة، كل اقتباس، كل مشاركة — هي استثمار في روح الجامعة.
-            </p>
-        </div>
-    </div>
-
-    <!-- الشريحة 7: المستقبل والتوسّع -->
-    <div id="slide-7" class="slide">
-        <div class="slide-content">
-            <h2 class="text-5xl font-bold mb-12" style="color: var(--color-accent);">🎭 المستقبل والتوسّع</h2>
-            
-            <p class="text-2xl mb-12">متحف الفكر ليس لحظة مؤقتة، بل بذرة مشروع ثقافي دائم.</p>
-
-            <ul class="space-y-6 text-2xl font-light text-left max-w-2xl mx-auto">
-                <li class="flex items-center">
-                    <span class="text-3xl mr-4" style="color: var(--color-primary);">🖼️</span>
-                    <span class="border-b border-dashed border-gray-500 pb-1">معارض فكرية وفنية دورية.</span>
-                </li>
-                <li class="flex items-center">
-                    <span class="text-3xl mr-4" style="color: var(--color-primary);">🏆</span>
-                    <span class="border-b border-dashed border-gray-500 pb-1">مسابقات تحفيزية لأفضل المشاركات.</span>
-                </li>
-                <li class="flex items-center">
-                    <span class="text-3xl mr-4" style="color: var(--color-primary);">🎙️</span>
-                    <span class="border-b border-dashed border-gray-500 pb-1">ندوات حول الفلسفة والإبداع والوعي الذاتي.</span>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- الشريحة 8: الدعوة الأخيرة -->
-    <div id="slide-8" class="slide">
-        <div class="slide-content">
-            <h2 class="text-5xl font-bold mb-12" style="color: var(--color-accent);">✨ الدعوة الأخيرة</h2>
-            
-            <div class="max-w-4xl mx-auto p-10 rounded-2xl shadow-2xl" style="background-color: #2c5282;">
-                <p class="text-5xl font-extrabold mb-8 leading-tight text-white">
-                    شارك بفكرة، كلمة، لوحة، أو حتى سؤال وجودي.
-                </p>
-                <p class="text-3xl font-light italic" style="color: var(--color-accent);">
-                    اترك أثرًا يُشبهك، لأن ما تزرعه اليوم سيكون ذاكرة الجامعة غدًا.
-                </p>
-            </div>
-            
-            <p class="mt-12 text-2xl font-semibold" style="color: var(--color-primary);">
-                🎓 متحف الفكر — لأن الفكر هو ما يجعلنا خالدين.
-            </p>
-        </div>
-    </div>
-
-    <script>
-        const slides = document.querySelectorAll('.slide');
-        let currentSlide = 0;
-        const totalSlides = slides.length;
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-
-        // وظيفة لعرض الشريحة الحالية وإخفاء البقية
-        function showSlide(index) {
-            slides.forEach((slide, i) => {
-                slide.classList.remove('active');
-                if (i === index) {
-                    slide.classList.add('active');
-                }
-            });
-            // تحديث حالة الأزرار
-            prevBtn.style.opacity = index === 0 ? '0.3' : '1';
-            nextBtn.style.opacity = index === totalSlides - 1 ? '0.3' : '1';
-        }
-
-        // الانتقال للشريحة السابقة
-        function prevSlide() {
-            if (currentSlide > 0) {
-                currentSlide--;
-                showSlide(currentSlide);
-            }
-        }
-
-        // الانتقال للشريحة التالية
-        function nextSlide() {
-            if (currentSlide < totalSlides - 1) {
-                currentSlide++;
-                showSlide(currentSlide);
-            }
-        }
-
-        // ربط وظائف التنقل بالأزرار
-        prevBtn.addEventListener('click', prevSlide);
-        nextBtn.addEventListener('click', nextSlide);
-
-        // التنقل باستخدام مفاتيح الأسهم
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === ' ') { // السهم الأيمن أو مفتاح المسافة
-                nextSlide();
-            } else if (e.key === 'ArrowLeft') { // السهم الأيسر
-                prevSlide();
-            }
-        });
-
-        // عرض الشريحة الأولى عند التحميل
-        showSlide(currentSlide);
-    </script>
-</body>
-</html>
