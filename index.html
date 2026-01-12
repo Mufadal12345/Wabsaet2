@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>متحف الفكر - بوابة الإبداع الفكري</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&amp;family=Amiri:wght@400;700&amp;display=swap" rel="stylesheet">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore-compat.js"></script>
     <style>
-        /* جميع الأنماط CSS السابقة تبقى كما هي */
         body {
             box-sizing: border-box;
             font-family: 'Tajawal', sans-serif;
@@ -51,6 +51,11 @@
             to { transform: translateX(100%); }
         }
         
+        @keyframes rotate-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
         .animate-float {
             animation: float 3s ease-in-out infinite;
         }
@@ -66,6 +71,10 @@
         
         .animate-fade-in {
             animation: fade-in 0.5s ease-out forwards;
+        }
+        
+        .animate-rotate-slow {
+            animation: rotate-slow 20s linear infinite;
         }
         
         .glass-card {
@@ -303,13 +312,21 @@
         .avatar-pulse {
             animation: pulse-glow 3s ease-in-out infinite;
         }
+        
+        .logo-container {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .logo-glow {
+            filter: drop-shadow(0 0 20px rgba(233, 69, 96, 0.6)) drop-shadow(0 0 40px rgba(251, 191, 36, 0.4));
+        }
     </style>
+    <style>@view-transition { navigation: auto; }</style>
 </head>
 <body class="h-full w-full gradient-bg text-white overflow-hidden">
     <!-- Menu Toggle Button (Mobile) -->
-    <button id="menuToggle" onclick="toggleSidebar()" class="menu-toggle w-14 h-14 rounded-full flex items-center justify-center text-2xl hidden">
-        🏛️
-    </button>
+    <button id="menuToggle" onclick="toggleSidebar()" class="menu-toggle w-14 h-14 rounded-full flex items-center justify-center text-2xl hidden">🏛️</button>
     
     <!-- Sidebar Overlay (Mobile) -->
     <div id="sidebarOverlay" class="sidebar-overlay" onclick="toggleSidebar()"></div>
@@ -319,25 +336,128 @@
         <div id="loginScreen" class="h-full w-full flex items-center justify-center p-4 overflow-auto">
             <div class="glass-card rounded-3xl p-8 w-full max-w-md animate-fade-in">
                 <div class="text-center mb-8">
-                    <div class="text-6xl mb-4 animate-float">
-                        🏛️
+                    <!-- Custom SVG Logo -->
+                    <div class="mb-6 flex justify-center logo-container">
+                        <svg width="140" height="140" viewbox="0 0 140 140" xmlns="http://www.w3.org/2000/svg" class="logo-glow animate-float">
+                            <defs>
+                                <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                    <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
+                                    <stop offset="30%" style="stop-color:#e94560;stop-opacity:0.9" />
+                                    <stop offset="70%" style="stop-color:#f472b6;stop-opacity:0.9" />
+                                    <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:1" />
+                                </linearGradient>
+                                <linearGradient id="goldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                    <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+                                    <stop offset="50%" style="stop-color:#fcd34d;stop-opacity:1" />
+                                    <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:1" />
+                                </linearGradient>
+                                <filter id="glow">
+                                    <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                                    <feMerge>
+                                        <feMergeNode in="coloredBlur" />
+                                        <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                </filter>
+                                <radialGradient id="glassGradient">
+                                    <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
+                                    <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.05" />
+                                </radialGradient>
+                            </defs>
+                            
+                            <!-- Outer Rotating Ring -->
+                            <circle cx="70" cy="70" r="65" fill="none" stroke="url(#logoGradient)" stroke-width="1.5" opacity="0.4" class="animate-rotate-slow" />
+                            
+                            <!-- Glass Circle Background -->
+                            <circle cx="70" cy="70" r="58" fill="url(#glassGradient)" filter="url(#glow)" />
+                            <circle cx="70" cy="70" r="58" fill="none" stroke="url(#logoGradient)" stroke-width="3" />
+                            
+                            <!-- Museum Building -->
+                            <g transform="translate(35, 80)">
+                                <!-- Pillars -->
+                                <rect x="5" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                <rect x="17" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                <rect x="29" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                <rect x="41" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                <rect x="53" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                <rect x="65" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                
+                                <!-- Roof -->
+                                <polygon points="37.5,-8 -2,5 77,5" fill="url(#goldGradient)" filter="url(#glow)" />
+                                <line x1="-2" y1="5" x2="77" y2="5" stroke="#fbbf24" stroke-width="2" />
+                                
+                                <!-- Base -->
+                                <rect x="0" y="35" width="75" height="6" fill="url(#goldGradient)" opacity="0.9" />
+                            </g>
+                            
+                            <!-- Brain Icon -->
+                            <g transform="translate(70, 42)">
+                                <!-- Brain Shape -->
+                                <ellipse cx="0" cy="0" rx="22" ry="18" fill="#f472b6" opacity="0.95" filter="url(#glow)" />
+                                
+                                <!-- Brain Details -->
+                                <path d="M-10,-8 Q-15,-11 -13,-16 Q-10,-18 -5,-16 Q0,-20 5,-16 Q10,-18 13,-16 Q15,-11 10,-8" fill="none" stroke="#fbbf24" stroke-width="2.5" opacity="0.9" filter="url(#glow)" />
+                                
+                                <!-- Neural Connections -->
+                                <circle cx="-8" cy="-3" r="2.5" fill="#fbbf24" opacity="0.95" />
+                                <circle cx="8" cy="-3" r="2.5" fill="#fbbf24" opacity="0.95" />
+                                <circle cx="0" cy="4" r="2.5" fill="#fbbf24" opacity="0.95" />
+                                <circle cx="-4" cy="8" r="1.5" fill="#fcd34d" opacity="0.9" />
+                                <circle cx="4" cy="8" r="1.5" fill="#fcd34d" opacity="0.9" />
+                                
+                                <!-- Connection Lines -->
+                                <line x1="-8" y1="-3" x2="0" y2="4" stroke="#fbbf24" stroke-width="1.5" opacity="0.6" />
+                                <line x1="8" y1="-3" x2="0" y2="4" stroke="#fbbf24" stroke-width="1.5" opacity="0.6" />
+                            </g>
+                            
+                            <!-- Sparkles -->
+                            <circle cx="25" cy="25" r="2" fill="#fbbf24" opacity="0.8">
+                                <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="115" cy="30" r="1.5" fill="#f472b6" opacity="0.8">
+                                <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" />
+                            </circle>
+                            <circle cx="110" cy="110" r="2" fill="#e94560" opacity="0.8">
+                                <animate attributeName="opacity" values="0.4;1;0.4" dur="1.8s" repeatCount="indefinite" />
+                            </circle>
+                        </svg>
                     </div>
-                    <h1 class="text-3xl font-bold gradient-text font-amiri" id="siteTitle">متحف الفكر</h1>
-                    <p class="text-gray-400 mt-2" id="welcomeMsg">بوابة الإبداع الفكري الرقمية</p>
+                    
+                    <h1 class="text-3xl font-bold gradient-text font-amiri mb-3" id="siteTitle">متحف الفكر</h1>
+                    
+                    <!-- University Name -->
+                    <div class="mb-2">
+                        <p class="text-base font-bold text-yellow-300 mb-1">🎓 جامعة زيان عاشور بالجلفة</p>
+                    </div>
+                    
+                    <p class="text-gray-400 text-sm mb-4" id="welcomeMsg">بوابة الإبداع الفكري الرقمية</p>
+                    
+                    <!-- Credits -->
+                    <div class="glass-card rounded-xl p-4 space-y-2">
+                        <div class="flex items-center justify-center gap-2 text-sm">
+                            <span class="text-pink-300 font-bold">💡 فكرة:</span>
+                            <span class="text-gray-300">شعيب سعاد رشا</span>
+                        </div>
+                        <div class="flex items-center justify-center gap-2 text-sm">
+                            <span class="text-purple-300 font-bold">💻 برمجة:</span>
+                            <span class="text-gray-300">مفضل</span>
+                        </div>
+                    </div>
                 </div>
+                
                 <div class="space-y-4">
                     <div>
                         <label for="loginName" class="block text-sm text-gray-300 mb-2">اسم المستخدم</label>
                         <input type="text" id="loginName" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="أدخل اسمك">
                     </div>
+                    
                     <div>
                         <label for="loginSpecialty" class="block text-sm text-gray-300 mb-2">التخصص / رمز الترقية (اختياري)</label>
                         <input type="text" id="loginSpecialty" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="أدخل تخصصك أو رمز الترقية">
                     </div>
-                    <button onclick="handleLogin()" class="btn-primary w-full py-3 rounded-xl text-white font-bold mt-6">
-                        🚀 دخول المتحف
-                    </button>
+                    
+                    <button onclick="handleLogin()" class="btn-primary w-full py-3 rounded-xl text-white font-bold mt-6">🚀 دخول المتحف</button>
                 </div>
+                
                 <div class="mt-6 text-center text-sm text-gray-400">
                     <p>انضم إلى مجتمع المفكرين والمبدعين</p>
                 </div>
@@ -357,51 +477,66 @@
                         </div>
                     </div>
                 </div>
+                
                 <nav class="flex-1 p-4 space-y-2 overflow-auto scrollbar-hide">
                     <button onclick="navigateTo('home')" class="sidebar-item active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="home">
                         <span class="text-xl">🏠</span>
                         <span>الرئيسية</span>
                     </button>
+                    
                     <button onclick="navigateTo('ideas')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="ideas">
                         <span class="text-xl">💡</span>
                         <span>الأفكار</span>
                     </button>
+                    
                     <button onclick="navigateTo('content')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="content">
                         <span class="text-xl">📚</span>
                         <span>المحتوى</span>
                     </button>
+                    
                     <button onclick="navigateTo('philosophy')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="philosophy">
                         <span class="text-xl">🧠</span>
                         <span>الفلسفة</span>
                     </button>
+                    
                     <button onclick="navigateTo('quotes')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="quotes">
                         <span class="text-xl">✨</span>
                         <span>العبارات الملهمة</span>
                     </button>
+                    
                     <button onclick="navigateTo('suggestions')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right position-relative" data-page="suggestions">
                         <span class="text-xl">📝</span>
                         <span>الاقتراحات</span>
                         <span id="suggestionsBadge" class="badge text-xs px-2 py-0.5 rounded-full mr-auto hidden">0</span>
                     </button>
                     
+                    <button onclick="navigateTo('about')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="about">
+                        <span class="text-xl">ℹ️</span>
+                        <span>عن المشروع</span>
+                    </button>
+                    
                     <div id="adminMenuItems" class="hidden space-y-2">
                         <div class="border-t border-white/10 my-4 pt-4">
                             <p class="text-xs text-gray-500 px-4 mb-2">إدارة النظام</p>
                         </div>
+                        
                         <button onclick="navigateTo('members')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="members">
                             <span class="text-xl">👥</span>
                             <span>الأعضاء</span>
                         </button>
+                        
                         <button onclick="navigateTo('codes')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="codes">
                             <span class="text-xl">🎫</span>
                             <span>رموز الدعوة</span>
                         </button>
+                        
                         <button onclick="navigateTo('settings')" class="sidebar-item w-full flex items-center gap-3 px-4 py-3 rounded-xl text-right" data-page="settings">
                             <span class="text-xl">⚙️</span>
                             <span>الإعدادات</span>
                         </button>
                     </div>
                 </nav>
+                
                 <div class="p-4 border-t border-white/10">
                     <div class="glass-card rounded-xl p-3 mb-3">
                         <div class="flex items-center gap-3">
@@ -414,6 +549,7 @@
                             </div>
                         </div>
                     </div>
+                    
                     <button onclick="handleLogout()" class="btn-secondary w-full py-2 rounded-xl text-sm flex items-center justify-center gap-2">
                         <span>🚪</span>
                         <span>تسجيل الخروج</span>
@@ -441,6 +577,7 @@
                                 <span class="text-4xl">💡</span>
                             </div>
                         </div>
+                        
                         <div class="stat-card glass-card rounded-2xl p-5 card-hover">
                             <div class="flex items-center justify-between">
                                 <div>
@@ -450,6 +587,7 @@
                                 <span class="text-4xl">👁️</span>
                             </div>
                         </div>
+                        
                         <div class="stat-card glass-card rounded-2xl p-5 card-hover">
                             <div class="flex items-center justify-between">
                                 <div>
@@ -459,6 +597,7 @@
                                 <span class="text-4xl">👥</span>
                             </div>
                         </div>
+                        
                         <div class="stat-card glass-card rounded-2xl p-5 card-hover">
                             <div class="flex items-center justify-between">
                                 <div>
@@ -541,6 +680,7 @@
                             <span>إضافة محتوى</span>
                         </button>
                     </div>
+                    
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="contentGrid">
                         <div class="glass-card rounded-xl p-6 text-center text-gray-400">
                             <p>لا يوجد محتوى حتى الآن</p>
@@ -554,19 +694,23 @@
                         <h2 class="text-3xl font-bold">🧠 تأملات فلسفية</h2>
                         <p class="text-gray-400 mt-1">أسئلة عميقة وتأملات في الوجود</p>
                     </div>
+                    
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="philosophyGrid">
                         <div class="glass-card rounded-2xl p-6 card-hover border-r-4 border-purple-500">
                             <h3 class="text-xl font-bold mb-3 text-purple-300">ما هي الفكرة؟</h3>
                             <p class="text-gray-300 leading-relaxed">الفكرة هي نواة التغيير، شرارة تضيء العقل وتفتح أبواب الإبداع. إنها البذرة التي تُزرع في تربة الوعي، لتنمو وتثمر إنجازات عظيمة. كل حضارة قامت على فكرة، وكل اختراع بدأ بخاطرة. الفكرة هي القوة الخفية التي تشكل واقعنا وترسم مستقبلنا.</p>
                         </div>
+                        
                         <div class="glass-card rounded-2xl p-6 card-hover border-r-4 border-indigo-500">
                             <h3 class="text-xl font-bold mb-3 text-indigo-300">الحرية والمسؤولية</h3>
                             <p class="text-gray-300 leading-relaxed">حرية الفكر هي أسمى أنواع الحرية، لكنها تحمل معها مسؤولية أخلاقية. فالعقل الحر قادر على تشكيل الواقع، لكنه مُطالب بأن يكون واعياً بتأثيره. الحرية بدون مسؤولية فوضى، والمسؤولية بدون حرية قيد. التوازن بينهما هو جوهر النضج الفكري.</p>
                         </div>
+                        
                         <div class="glass-card rounded-2xl p-6 card-hover border-r-4 border-pink-500">
                             <h3 class="text-xl font-bold mb-3 text-pink-300">الفكر والواقع</h3>
                             <p class="text-gray-300 leading-relaxed">هل الفكر يشكل الواقع أم الواقع يشكل الفكر؟ جدلية قديمة تكشف عن علاقة متبادلة عميقة. أفكارنا تبني واقعنا، وواقعنا يلهم أفكارنا. إنها دائرة مستمرة من التأثير والتأثر، حيث يصبح التفكير الواعي أداة لتحويل الواقع نحو الأفضل.</p>
                         </div>
+                        
                         <div class="glass-card rounded-2xl p-6 card-hover border-r-4 border-orange-500">
                             <h3 class="text-xl font-bold mb-3 text-orange-300">قيمة الصمت</h3>
                             <p class="text-gray-300 leading-relaxed">في عالم مليء بالضجيج والمعلومات المتدفقة، يصبح الصمت ضرورة فكرية. الصمت ليس غياباً للصوت، بل حضور للوعي. إنه المساحة التي يحتاجها العقل ليعيد ترتيب أفكاره، ليتأمل، ليبدع. في الصمت تولد الأفكار العظيمة، وفي الهدوء تتضح الرؤى.</p>
@@ -580,6 +724,7 @@
                         <h2 class="text-3xl font-bold">✨ العبارات الملهمة</h2>
                         <p class="text-gray-400 mt-1">كلمات تلهم وتحفز</p>
                     </div>
+                    
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="quotesGrid">
                         <!-- Quotes will be rendered here -->
                     </div>
@@ -628,12 +773,183 @@
                     </div>
                 </div>
                 
+                <!-- About Page -->
+                <div id="aboutPage" class="page-content hidden animate-fade-in">
+                    <div class="mb-8">
+                        <h2 class="text-3xl font-bold mb-2">ℹ️ عن المشروع</h2>
+                        <p class="text-gray-400">معلومات حول متحف الفكر</p>
+                    </div>
+                    
+                    <!-- Logo Section -->
+                    <div class="glass-card rounded-2xl p-8 mb-6 text-center">
+                        <div class="flex justify-center mb-6">
+                            <svg width="160" height="160" viewbox="0 0 140 140" xmlns="http://www.w3.org/2000/svg" class="logo-glow">
+                                <defs>
+                                    <linearGradient id="aboutLogoGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" style="stop-color:#0f172a;stop-opacity:1" />
+                                        <stop offset="30%" style="stop-color:#e94560;stop-opacity:0.9" />
+                                        <stop offset="70%" style="stop-color:#f472b6;stop-opacity:0.9" />
+                                        <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:1" />
+                                    </linearGradient>
+                                    <linearGradient id="aboutGoldGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                        <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+                                        <stop offset="50%" style="stop-color:#fcd34d;stop-opacity:1" />
+                                        <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:1" />
+                                    </linearGradient>
+                                    <filter id="aboutGlow">
+                                        <feGaussianBlur stdDeviation="2" result="coloredBlur" />
+                                        <feMerge>
+                                            <feMergeNode in="coloredBlur" />
+                                            <feMergeNode in="SourceGraphic" />
+                                        </feMerge>
+                                    </filter>
+                                    <radialGradient id="aboutGlassGradient">
+                                        <stop offset="0%" style="stop-color:#ffffff;stop-opacity:0.3" />
+                                        <stop offset="100%" style="stop-color:#ffffff;stop-opacity:0.05" />
+                                    </radialGradient>
+                                </defs>
+                                <circle cx="70" cy="70" r="65" fill="none" stroke="url(#aboutLogoGradient)" stroke-width="1.5" opacity="0.4" />
+                                <circle cx="70" cy="70" r="58" fill="url(#aboutGlassGradient)" filter="url(#aboutGlow)" />
+                                <circle cx="70" cy="70" r="58" fill="none" stroke="url(#aboutLogoGradient)" stroke-width="3" />
+                                <g transform="translate(35, 80)">
+                                    <rect x="5" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                    <rect x="17" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                    <rect x="29" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                    <rect x="41" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                    <rect x="53" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                    <rect x="65" y="5" width="6" height="30" fill="#e94560" opacity="0.9" />
+                                    <polygon points="37.5,-8 -2,5 77,5" fill="url(#aboutGoldGradient)" filter="url(#aboutGlow)" />
+                                    <line x1="-2" y1="5" x2="77" y2="5" stroke="#fbbf24" stroke-width="2" />
+                                    <rect x="0" y="35" width="75" height="6" fill="url(#aboutGoldGradient)" opacity="0.9" />
+                                </g>
+                                <g transform="translate(70, 42)">
+                                    <ellipse cx="0" cy="0" rx="22" ry="18" fill="#f472b6" opacity="0.95" filter="url(#aboutGlow)" />
+                                    <path d="M-10,-8 Q-15,-11 -13,-16 Q-10,-18 -5,-16 Q0,-20 5,-16 Q10,-18 13,-16 Q15,-11 10,-8" fill="none" stroke="#fbbf24" stroke-width="2.5" opacity="0.9" filter="url(#aboutGlow)" />
+                                    <circle cx="-8" cy="-3" r="2.5" fill="#fbbf24" opacity="0.95" />
+                                    <circle cx="8" cy="-3" r="2.5" fill="#fbbf24" opacity="0.95" />
+                                    <circle cx="0" cy="4" r="2.5" fill="#fbbf24" opacity="0.95" />
+                                    <circle cx="-4" cy="8" r="1.5" fill="#fcd34d" opacity="0.9" />
+                                    <circle cx="4" cy="8" r="1.5" fill="#fcd34d" opacity="0.9" />
+                                    <line x1="-8" y1="-3" x2="0" y2="4" stroke="#fbbf24" stroke-width="1.5" opacity="0.6" />
+                                    <line x1="8" y1="-3" x2="0" y2="4" stroke="#fbbf24" stroke-width="1.5" opacity="0.6" />
+                                </g>
+                                <circle cx="25" cy="25" r="2" fill="#fbbf24" opacity="0.8">
+                                    <animate attributeName="opacity" values="0.3;1;0.3" dur="2s" repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="115" cy="30" r="1.5" fill="#f472b6" opacity="0.8">
+                                    <animate attributeName="opacity" values="0.5;1;0.5" dur="1.5s" repeatCount="indefinite" />
+                                </circle>
+                                <circle cx="110" cy="110" r="2" fill="#e94560" opacity="0.8">
+                                    <animate attributeName="opacity" values="0.4;1;0.4" dur="1.8s" repeatCount="indefinite" />
+                                </circle>
+                            </svg>
+                        </div>
+                        <h1 class="text-4xl font-bold gradient-text font-amiri mb-4">متحف الفكر</h1>
+                        <p class="text-xl text-gray-300 mb-2">بوابة الإبداع الفكري الرقمية</p>
+                        <p class="text-gray-400">منصة لتبادل الأفكار والإبداع الفكري</p>
+                    </div>
+                    
+                    <!-- University Section -->
+                    <div class="glass-card rounded-2xl p-6 mb-6">
+                        <div class="flex items-center gap-4 mb-4">
+                            <span class="text-5xl">🎓</span>
+                            <div>
+                                <h3 class="text-2xl font-bold text-yellow-300">جامعة زيان عاشور بالجلفة</h3>
+                                <p class="text-gray-400">مؤسسة تعليمية عريقة</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-300 leading-relaxed">تسعى جامعة زيان عاشور بالجلفة إلى تقديم تعليم نوعي وتشجيع البحث العلمي والابتكار. هذا المشروع يمثل رؤية الجامعة في دعم الطلاب والمبدعين وتوفير منصات رقمية حديثة لتبادل المعرفة والأفكار.</p>
+                    </div>
+                    
+                    <!-- Credits Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Idea -->
+                        <div class="glass-card rounded-2xl p-6 border-r-4 border-pink-500">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-4xl">💡</span>
+                                <h3 class="text-xl font-bold text-pink-300">فكرة المشروع</h3>
+                            </div>
+                            <p class="text-2xl font-bold mb-2">شعيب سعاد رشا</p>
+                            <p class="text-gray-400">صاحبة الفكرة الأصلية لمتحف الفكر. رؤية إبداعية لإنشاء فضاء رقمي يجمع المبدعين والمفكرين في منصة واحدة لتبادل الأفكار والإلهام.</p>
+                        </div>
+                        
+                        <!-- Programming -->
+                        <div class="glass-card rounded-2xl p-6 border-r-4 border-purple-500">
+                            <div class="flex items-center gap-3 mb-4">
+                                <span class="text-4xl">💻</span>
+                                <h3 class="text-xl font-bold text-purple-300">التطوير والبرمجة</h3>
+                            </div>
+                            <p class="text-2xl font-bold mb-2">مفضل</p>
+                            <p class="text-gray-400">المطور المسؤول عن تحويل الفكرة إلى واقع رقمي. تصميم وبرمجة المنصة بتقنيات حديثة لتوفير تجربة مستخدم سلسة وجميلة.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Features -->
+                    <div class="glass-card rounded-2xl p-6 mt-6">
+                        <h3 class="text-xl font-bold mb-4 flex items-center gap-2">
+                            <span>⚡</span>
+                            <span>مميزات المنصة</span>
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="flex items-start gap-3">
+                                <span class="text-2xl">💡</span>
+                                <div>
+                                    <p class="font-bold text-pink-300">معرض الأفكار</p>
+                                    <p class="text-sm text-gray-400">منصة لمشاركة واستكشاف الأفكار الإبداعية</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="text-2xl">📚</span>
+                                <div>
+                                    <p class="font-bold text-pink-300">المحتوى الفكري</p>
+                                    <p class="text-sm text-gray-400">مقالات ونصوص ملهمة من المبدعين</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="text-2xl">🧠</span>
+                                <div>
+                                    <p class="font-bold text-pink-300">التأملات الفلسفية</p>
+                                    <p class="text-sm text-gray-400">أسئلة عميقة وتأملات في الوجود</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="text-2xl">💾</span>
+                                <div>
+                                    <p class="font-bold text-pink-300">قاعدة بيانات متكاملة</p>
+                                    <p class="text-sm text-gray-400">حفظ تلقائي لجميع البيانات والتفاعلات</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="text-2xl">🎨</span>
+                                <div>
+                                    <p class="font-bold text-pink-300">تصميم عصري</p>
+                                    <p class="text-sm text-gray-400">واجهة جميلة بتأثيرات Glassmorphism</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <span class="text-2xl">📱</span>
+                                <div>
+                                    <p class="font-bold text-pink-300">متجاوب كلياً</p>
+                                    <p class="text-sm text-gray-400">يعمل على جميع الأجهزة بسلاسة</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Version -->
+                    <div class="text-center mt-8 text-gray-500 text-sm">
+                        <p>الإصدار 1.0 | 2025 © جميع الحقوق محفوظة</p>
+                        <p class="mt-1">صُنع بـ ❤️ في جامعة زيان عاشور بالجلفة</p>
+                    </div>
+                </div>
+                
                 <!-- Members Page (Admin Only) -->
                 <div id="membersPage" class="page-content hidden animate-fade-in">
                     <div class="mb-6">
                         <h2 class="text-3xl font-bold">👥 إدارة الأعضاء</h2>
                         <p class="text-gray-400 mt-1">قائمة جميع الأعضاء المسجلين</p>
                     </div>
+                    
                     <div class="grid grid-cols-1 gap-6">
                         <!-- Admins -->
                         <div class="glass-card rounded-2xl p-6">
@@ -701,6 +1017,7 @@
                         <h2 class="text-3xl font-bold">⚙️ إعدادات النظام</h2>
                         <p class="text-gray-400 mt-1">إدارة وتهيئة المتحف</p>
                     </div>
+                    
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         <div class="glass-card rounded-2xl p-6">
                             <h3 class="text-xl font-bold mb-4">📊 إحصائيات النظام</h3>
@@ -723,6 +1040,7 @@
                                 </div>
                             </div>
                         </div>
+                        
                         <div class="glass-card rounded-2xl p-6">
                             <h3 class="text-xl font-bold mb-4">🛠️ أدوات الإدارة</h3>
                             <div class="space-y-4">
@@ -751,90 +1069,86 @@
                 </div>
             </main>
         </div>
-    </div>
-    
-    <!-- Add Idea Modal -->
-    <div id="addIdeaModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-dark rounded-2xl p-6 w-full max-w-lg animate-fade-in">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-bold">💡 إضافة فكرة جديدة</h3>
-                <button onclick="closeModal('addIdeaModal')" class="text-gray-400 hover:text-white text-2xl">×</button>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label for="ideaTitle" class="block text-sm text-gray-300 mb-2">عنوان الفكرة</label>
-                    <input type="text" id="ideaTitle" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="عنوان موجز وجذاب">
+        
+        <!-- Add Idea Modal -->
+        <div id="addIdeaModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
+            <div class="glass-dark rounded-2xl p-6 w-full max-w-lg animate-fade-in">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold">💡 إضافة فكرة جديدة</h3>
+                    <button onclick="closeModal('addIdeaModal')" class="text-gray-400 hover:text-white text-2xl">×</button>
                 </div>
-                <div>
-                    <label for="ideaCategory" class="block text-sm text-gray-300 mb-2">التصنيف</label>
-                    <select id="ideaCategory" class="input-style w-full px-4 py-3 rounded-xl text-white">
-                        <option value="فلسفة">🧠 فلسفة</option>
-                        <option value="تقنية">💻 تقنية</option>
-                        <option value="أدب">📖 أدب</option>
-                        <option value="علوم">🔬 علوم</option>
-                        <option value="فن">🎨 فن</option>
-                        <option value="اجتماع">👥 اجتماع</option>
-                    </select>
+                <div class="space-y-4">
+                    <div>
+                        <label for="ideaTitle" class="block text-sm text-gray-300 mb-2">عنوان الفكرة</label>
+                        <input type="text" id="ideaTitle" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="عنوان موجز وجذاب">
+                    </div>
+                    <div>
+                        <label for="ideaCategory" class="block text-sm text-gray-300 mb-2">التصنيف</label>
+                        <select id="ideaCategory" class="input-style w-full px-4 py-3 rounded-xl text-white">
+                            <option value="فلسفة">🧠 فلسفة</option>
+                            <option value="تقنية">💻 تقنية</option>
+                            <option value="أدب">📖 أدب</option>
+                            <option value="علوم">🔬 علوم</option>
+                            <option value="فن">🎨 فن</option>
+                            <option value="اجتماع">👥 اجتماع</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="ideaContent" class="block text-sm text-gray-300 mb-2">محتوى الفكرة</label>
+                        <textarea id="ideaContent" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400 h-32 resize-none" placeholder="اشرح فكرتك بالتفصيل..."></textarea>
+                    </div>
+                    <button onclick="submitIdea()" class="btn-primary w-full py-3 rounded-xl font-bold">
+                        <span id="submitIdeaBtnText">نشر الفكرة</span>
+                        <div id="submitIdeaSpinner" class="loading-spinner hidden mx-auto"></div>
+                    </button>
                 </div>
-                <div>
-                    <label for="ideaContent" class="block text-sm text-gray-300 mb-2">محتوى الفكرة</label>
-                    <textarea id="ideaContent" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400 h-32 resize-none" placeholder="اشرح فكرتك بالتفصيل..."></textarea>
-                </div>
-                <button onclick="submitIdea()" class="btn-primary w-full py-3 rounded-xl font-bold">
-                    <span id="submitIdeaBtnText">نشر الفكرة</span>
-                    <div id="submitIdeaSpinner" class="loading-spinner hidden mx-auto"></div>
-                </button>
             </div>
         </div>
-    </div>
-    
-    <!-- Add Content Modal -->
-    <div id="addContentModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-dark rounded-2xl p-6 w-full max-w-lg animate-fade-in">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-xl font-bold">📚 إضافة محتوى جديد</h3>
-                <button onclick="closeModal('addContentModal')" class="text-gray-400 hover:text-white text-2xl">×</button>
-            </div>
-            <div class="space-y-4">
-                <div>
-                    <label for="contentTitle" class="block text-sm text-gray-300 mb-2">عنوان المحتوى</label>
-                    <input type="text" id="contentTitle" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="عنوان المقال أو النص">
+        
+        <!-- Add Content Modal -->
+        <div id="addContentModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
+            <div class="glass-dark rounded-2xl p-6 w-full max-w-lg animate-fade-in">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-xl font-bold">📚 إضافة محتوى جديد</h3>
+                    <button onclick="closeModal('addContentModal')" class="text-gray-400 hover:text-white text-2xl">×</button>
                 </div>
-                <div>
-                    <label for="contentText" class="block text-sm text-gray-300 mb-2">المحتوى</label>
-                    <textarea id="contentText" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400 h-40 resize-none" placeholder="اكتب المحتوى هنا..."></textarea>
+                <div class="space-y-4">
+                    <div>
+                        <label for="contentTitle" class="block text-sm text-gray-300 mb-2">عنوان المحتوى</label>
+                        <input type="text" id="contentTitle" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="عنوان المقال أو النص">
+                    </div>
+                    <div>
+                        <label for="contentText" class="block text-sm text-gray-300 mb-2">المحتوى</label>
+                        <textarea id="contentText" class="input-style w-full px-4 py-3 rounded-xl text-white placeholder-gray-400 h-40 resize-none" placeholder="اكتب المحتوى هنا..."></textarea>
+                    </div>
+                    <button onclick="submitContent()" class="btn-primary w-full py-3 rounded-xl font-bold">
+                        <span id="submitContentBtnText">نشر المحتوى</span>
+                        <div id="submitContentSpinner" class="loading-spinner hidden mx-auto"></div>
+                    </button>
                 </div>
-                <button onclick="submitContent()" class="btn-primary w-full py-3 rounded-xl font-bold">
-                    <span id="submitContentBtnText">نشر المحتوى</span>
-                    <div id="submitContentSpinner" class="loading-spinner hidden mx-auto"></div>
-                </button>
             </div>
         </div>
-    </div>
-    
-    <!-- Confirm Modal -->
-    <div id="confirmModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
-        <div class="glass-dark rounded-2xl p-6 w-full max-w-sm animate-fade-in text-center">
-            <div class="text-5xl mb-4">
-                ⚠️
-            </div>
-            <h3 class="text-xl font-bold mb-2" id="confirmTitle">تأكيد الحذف</h3>
-            <p class="text-gray-400 mb-6" id="confirmMessage">هل أنت متأكد من هذا الإجراء؟</p>
-            <div class="flex gap-4">
-                <button onclick="closeModal('confirmModal')" class="btn-secondary flex-1 py-3 rounded-xl">إلغاء</button>
-                <button onclick="executeConfirmedAction()" class="flex-1 py-3 rounded-xl bg-red-500 hover:bg-red-600 transition-all">تأكيد</button>
+        
+        <!-- Confirm Modal -->
+        <div id="confirmModal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
+            <div class="glass-dark rounded-2xl p-6 w-full max-w-sm animate-fade-in text-center">
+                <div class="text-5xl mb-4">
+                    ⚠️
+                </div>
+                <h3 class="text-xl font-bold mb-2" id="confirmTitle">تأكيد الحذف</h3>
+                <p class="text-gray-400 mb-6" id="confirmMessage">هل أنت متأكد من هذا الإجراء؟</p>
+                <div class="flex gap-4">
+                    <button onclick="closeModal('confirmModal')" class="btn-secondary flex-1 py-3 rounded-xl">إلغاء</button>
+                    <button onclick="executeConfirmedAction()" class="flex-1 py-3 rounded-xl bg-red-500 hover:bg-red-600 transition-all">تأكيد</button>
+                </div>
             </div>
         </div>
+        
+        <!-- Toast Container -->
+        <div id="toastContainer" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-80 z-50 space-y-2"></div>
     </div>
-    
-    <!-- Toast Container -->
-    <div id="toastContainer" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-80 z-50 space-y-2"></div>
     
     <script>
-        // ============================================
-        // إعدادات Firebase
-        // ============================================
-        
         // Firebase Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyAVp26636YGOwPIT8X6kWsxKWEnta3A0G4",
@@ -847,187 +1161,36 @@
         };
 
         // Initialize Firebase
-        const app = firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore(app);
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
 
-        // ============================================
-        // نظام البيانات باستخدام Firebase Firestore
-        // ============================================
-        
-        const dataSdk = {
-            // تهيئة البيانات
-            init: async function(handler) {
-                try {
-                    await this.loadAllData();
-                    if (handler && handler.onDataChanged) {
-                        handler.onDataChanged(appData);
-                    }
-                    return { isOk: true };
-                } catch (error) {
-                    console.error('Error initializing data:', error);
-                    return { isOk: false };
-                }
-            },
-            
-            // جلب جميع البيانات
-            loadAllData: async function() {
-                try {
-                    const snapshot = await db.collection('museumData').orderBy('createdAt', 'desc').get();
-                    appData = snapshot.docs.map(doc => ({ 
-                        id: doc.id,
-                        ...doc.data()
-                    }));
-                    return appData;
-                } catch (error) {
-                    console.error('Error loading data:', error);
-                    throw error;
-                }
-            },
-            
-            // إنشاء عنصر جديد
-            create: async function(item) {
-                try {
-                    const newItem = {
-                        ...item,
-                        createdAt: item.createdAt || new Date().toISOString(),
-                        updatedAt: new Date().toISOString()
-                    };
-                    
-                    const docRef = await db.collection('museumData').add(newItem);
-                    const doc = await docRef.get();
-                    const createdItem = { 
-                        id: doc.id,
-                        ...doc.data()
-                    };
-                    
-                    appData.unshift(createdItem);
-                    if (dataHandler && dataHandler.onDataChanged) {
-                        dataHandler.onDataChanged(appData);
-                    }
-                    
-                    return { isOk: true, data: createdItem };
-                } catch (error) {
-                    console.error('Error creating item:', error);
-                    return { isOk: false };
-                }
-            },
-            
-            // تحديث عنصر موجود
-            update: async function(updatedItem) {
-                try {
-                    const itemId = updatedItem.id;
-                    if (!itemId) {
-                        console.error('Item ID is required for update');
-                        return { isOk: false };
-                    }
-                    
-                    const updateData = { ...updatedItem };
-                    delete updateData.id;
-                    updateData.updatedAt = new Date().toISOString();
-                    
-                    await db.collection('museumData').doc(itemId).update(updateData);
-                    
-                    const index = appData.findIndex(item => item.id === itemId);
-                    if (index !== -1) {
-                        appData[index] = { id: itemId, ...updateData };
-                        if (dataHandler && dataHandler.onDataChanged) {
-                            dataHandler.onDataChanged(appData);
-                        }
-                    }
-                    
-                    return { isOk: true, data: { id: itemId, ...updateData } };
-                } catch (error) {
-                    console.error('Error updating item:', error);
-                    return { isOk: false };
-                }
-            },
-            
-            // حذف عنصر
-            delete: async function(itemToDelete) {
-                try {
-                    const itemId = itemToDelete.id;
-                    if (!itemId) {
-                        console.error('Item ID is required for delete');
-                        return { isOk: false };
-                    }
-                    
-                    await db.collection('museumData').doc(itemId).delete();
-                    
-                    const index = appData.findIndex(item => item.id === itemId);
-                    if (index !== -1) {
-                        appData.splice(index, 1);
-                        if (dataHandler && dataHandler.onDataChanged) {
-                            dataHandler.onDataChanged(appData);
-                        }
-                    }
-                    
-                    return { isOk: true };
-                } catch (error) {
-                    console.error('Error deleting item:', error);
-                    return { isOk: false };
-                }
-            },
-            
-            // الاستماع للتحديثات في الوقت الحقيقي
-            subscribeToUpdates: function(callback) {
-                return db.collection('museumData')
-                    .orderBy('createdAt', 'desc')
-                    .onSnapshot((snapshot) => {
-                        const changes = snapshot.docChanges();
-                        changes.forEach((change) => {
-                            if (change.type === 'added') {
-                                const newItem = { id: change.doc.id, ...change.doc.data() };
-                                const exists = appData.some(item => item.id === newItem.id);
-                                if (!exists) {
-                                    appData.unshift(newItem);
-                                }
-                            } else if (change.type === 'modified') {
-                                const updatedItem = { id: change.doc.id, ...change.doc.data() };
-                                const index = appData.findIndex(item => item.id === updatedItem.id);
-                                if (index !== -1) {
-                                    appData[index] = updatedItem;
-                                }
-                            } else if (change.type === 'removed') {
-                                const removedId = change.doc.id;
-                                const index = appData.findIndex(item => item.id === removedId);
-                                if (index !== -1) {
-                                    appData.splice(index, 1);
-                                }
-                            }
-                        });
-                        
-                        if (callback) {
-                            callback(appData);
-                        }
-                    });
-            }
-        };
-        
-        // ============================================
-        // إعدادات التطبيق الأساسية
-        // ============================================
-        
         // Default Configuration
         const defaultConfig = {
             site_title: 'متحف الفكر',
             welcome_message: 'بوابة الإبداع الفكري الرقمية'
         };
-        
+
         // App State
-        let appData = [];
+        let appData = {
+            users: [],
+            ideas: [],
+            content: [],
+            suggestions: [],
+            codes: []
+        };
         let currentUser = null;
         let currentPage = 'home';
         let currentFilter = 'all';
         let confirmAction = null;
         let viewedIdeas = new Set();
-        let unsubscribeFromUpdates = null;
-        
+
         // Admin Credentials
         const ADMINS = [
             { name: 'Rasha', specialty: '20250929' },
             { name: 'MUF', specialty: 'CS' }
         ];
-        
+
         // Inspirational Quotes
         const QUOTES = [
             { text: "العقل كالمظلة، لا يعمل إلا إذا كان مفتوحاً", author: "حكمة شعبية" },
@@ -1044,7 +1207,7 @@
             { text: "القمة ليست الهدف، بل الرحلة إليها", author: "من حكم المسافرين" },
             { text: "الفكرة هي البذرة، والعقل هو التربة، والإبداع هو الثمرة", author: "من حكم متحف الفكر" }
         ];
-        
+
         // Category Icons
         const CATEGORY_ICONS = {
             'فلسفة': '🧠',
@@ -1054,49 +1217,35 @@
             'فن': '🎨',
             'اجتماع': '👥'
         };
-        
-        // Data Handler
-        const dataHandler = {
-            onDataChanged(data) {
-                appData = data;
-                updateUI();
-            }
+
+        // Firebase Collection References
+        const collections = {
+            users: db.collection('users'),
+            ideas: db.collection('ideas'),
+            content: db.collection('content'),
+            suggestions: db.collection('suggestions'),
+            codes: db.collection('codes')
         };
-        
-        // ============================================
-        // دوال التطبيق الأساسية
-        // ============================================
-        
+
         // Initialize App
         async function initApp() {
             try {
-                // Load data from Firestore
-                await dataSdk.init(dataHandler);
-                
-                // Subscribe to real-time updates
-                unsubscribeFromUpdates = dataSdk.subscribeToUpdates((data) => {
-                    appData = data;
-                    updateUI();
-                });
-                
-                // Load site config from Firestore
-                await loadSiteConfig();
-                
                 // Check for saved session
                 const savedUser = localStorage.getItem('muf_user');
                 if (savedUser) {
                     currentUser = JSON.parse(savedUser);
+                    await loadAllData();
                     showMainApp();
                 }
-                
+
                 // Render quotes
                 renderQuotes();
-                
+
                 // Show menu toggle on mobile
                 if (window.innerWidth < 769) {
                     document.getElementById('menuToggle').classList.remove('hidden');
                 }
-                
+
                 // Handle window resize
                 window.addEventListener('resize', () => {
                     if (window.innerWidth < 769) {
@@ -1107,55 +1256,88 @@
                         document.getElementById('sidebarOverlay').classList.remove('active');
                     }
                 });
-                
-                // Add online/offline detection
-                window.addEventListener('online', () => {
-                    showToast('تم استعادة الاتصال بالإنترنت', 'success');
-                    dataSdk.loadAllData().then(() => updateUI());
-                });
-                
-                window.addEventListener('offline', () => {
-                    showToast('فقد الاتصال بالإنترنت، يتم العمل في الوضع المحلي', 'error');
-                });
-                
+
             } catch (error) {
                 console.error('Error initializing app:', error);
-                showToast('حدث خطأ في تحميل البيانات', 'error');
+                showToast('خطأ في تهيئة التطبيق', 'error');
             }
         }
-        
-        // Load site config from Firestore
-        async function loadSiteConfig() {
+
+        // Load all data from Firestore
+        async function loadAllData() {
             try {
-                const doc = await db.collection('museumConfig').doc('siteConfig').get();
-                const config = doc.exists ? doc.data() : defaultConfig;
+                const promises = [
+                    collections.users.get(),
+                    collections.ideas.get(),
+                    collections.content.get(),
+                    collections.suggestions.get(),
+                    collections.codes.get()
+                ];
+
+                const results = await Promise.all(promises);
+
+                appData = {
+                    users: results[0].docs.map(doc => ({ id: doc.id, ...doc.data() })),
+                    ideas: results[1].docs.map(doc => ({ id: doc.id, ...doc.data() })),
+                    content: results[2].docs.map(doc => ({ id: doc.id, ...doc.data() })),
+                    suggestions: results[3].docs.map(doc => ({ id: doc.id, ...doc.data() })),
+                    codes: results[4].docs.map(doc => ({ id: doc.id, ...doc.data() }))
+                };
+
+                updateUI();
                 
-                const siteTitleEl = document.getElementById('siteTitle');
-                const welcomeMsgEl = document.getElementById('welcomeMsg');
-                
-                if (siteTitleEl) siteTitleEl.textContent = config.site_title || defaultConfig.site_title;
-                if (welcomeMsgEl) welcomeMsgEl.textContent = config.welcome_message || defaultConfig.welcome_message;
+                // Set up real-time listeners
+                setupRealtimeListeners();
+
             } catch (error) {
-                console.error('Error loading site config:', error);
-                // Fallback to default config
-                const siteTitleEl = document.getElementById('siteTitle');
-                const welcomeMsgEl = document.getElementById('welcomeMsg');
-                if (siteTitleEl) siteTitleEl.textContent = defaultConfig.site_title;
-                if (welcomeMsgEl) welcomeMsgEl.textContent = defaultConfig.welcome_message;
+                console.error('Error loading data:', error);
+                showToast('خطأ في تحميل البيانات', 'error');
             }
         }
-        
-        // Save site config to Firestore
-        async function saveSiteConfig(config) {
-            try {
-                await db.collection('museumConfig').doc('siteConfig').set(config, { merge: true });
-                return true;
-            } catch (error) {
-                console.error('Error saving site config:', error);
-                return false;
-            }
+
+        // Set up real-time listeners
+        function setupRealtimeListeners() {
+            // Listen for users changes
+            collections.users.onSnapshot((snapshot) => {
+                appData.users = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if (currentPage === 'members' || currentPage === 'home' || currentPage === 'settings') {
+                    updateUI();
+                }
+            });
+
+            // Listen for ideas changes
+            collections.ideas.onSnapshot((snapshot) => {
+                appData.ideas = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if (currentPage === 'ideas' || currentPage === 'home' || currentPage === 'ideaDetail' || currentPage === 'settings') {
+                    updateUI();
+                }
+            });
+
+            // Listen for content changes
+            collections.content.onSnapshot((snapshot) => {
+                appData.content = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if (currentPage === 'content') {
+                    updateUI();
+                }
+            });
+
+            // Listen for suggestions changes
+            collections.suggestions.onSnapshot((snapshot) => {
+                appData.suggestions = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if (currentPage === 'suggestions' || currentPage === 'home' || currentPage === 'settings') {
+                    updateUI();
+                }
+            });
+
+            // Listen for codes changes
+            collections.codes.onSnapshot((snapshot) => {
+                appData.codes = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                if (currentPage === 'codes' || currentPage === 'settings') {
+                    updateUI();
+                }
+            });
         }
-        
+
         // Toggle Sidebar (Mobile)
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -1164,11 +1346,7 @@
             sidebar.classList.toggle('sidebar-open');
             overlay.classList.toggle('active');
         }
-        
-        // ============================================
-        // نظام تسجيل الدخول والمستخدمين
-        // ============================================
-        
+
         // Login Handler
         async function handleLogin() {
             const name = document.getElementById('loginName').value.trim();
@@ -1179,18 +1357,13 @@
                 return;
             }
             
-            const btn = event.target;
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<div class="loading-spinner mx-auto"></div>';
-            btn.disabled = true;
-            
             try {
                 // Check if admin
                 const isAdmin = ADMINS.some(a => a.name === name && a.specialty === specialty);
                 
                 // Check if using upgrade code
-                const codes = appData.filter(d => d.type === 'code' && !d.usedBy);
-                const usedCode = codes.find(c => c.code === specialty);
+                const unusedCodes = appData.codes.filter(c => !c.usedBy);
+                const usedCode = unusedCodes.find(c => c.code === specialty);
                 
                 let role = 'user';
                 let upgradeCode = null;
@@ -1201,21 +1374,19 @@
                     role = 'premium';
                     upgradeCode = specialty;
                     // Mark code as used
-                    await dataSdk.update({
-                        ...usedCode,
+                    await collections.codes.doc(usedCode.id).update({
                         usedBy: name,
                         usedAt: new Date().toISOString()
                     });
                 }
                 
                 // Check if user already exists
-                const existingUser = appData.find(d => d.type === 'user' && d.title === name);
+                const existingUser = appData.users.find(u => u.name === name);
                 
                 if (existingUser) {
                     // Update existing user if they used a new upgrade code
                     if (upgradeCode && existingUser.role === 'user') {
-                        await dataSdk.update({
-                            ...existingUser,
+                        await collections.users.doc(existingUser.id).update({
                             role: 'premium',
                             upgradeCode: upgradeCode
                         });
@@ -1226,37 +1397,31 @@
                     }
                     
                     currentUser = {
-                        name: existingUser.title,
+                        id: existingUser.id,
+                        name: existingUser.name,
                         specialty: existingUser.specialty,
                         role: role,
-                        upgradeCode: upgradeCode,
-                        id: existingUser.id
+                        upgradeCode: upgradeCode
                     };
                 } else {
                     // Create new user
-                    currentUser = {
+                    const userData = {
                         name,
                         specialty: role === 'premium' ? 'عضو مميز' : (specialty || 'مستخدم'),
                         role,
-                        upgradeCode
-                    };
-                    
-                    const userResult = await dataSdk.create({
-                        type: 'user',
-                        title: name,
-                        specialty: currentUser.specialty,
-                        role,
                         upgradeCode: upgradeCode || '',
                         createdAt: new Date().toISOString()
-                    });
+                    };
                     
-                    if (userResult.isOk) {
-                        currentUser.id = userResult.data.id;
-                    }
+                    const docRef = await collections.users.add(userData);
+                    currentUser = {
+                        id: docRef.id,
+                        ...userData
+                    };
                 }
                 
-                // Save user to localStorage
                 localStorage.setItem('muf_user', JSON.stringify(currentUser));
+                await loadAllData();
                 showMainApp();
                 
                 const roleText = role === 'admin' ? '👑 مدير' : role === 'premium' ? '💡 عضو مميز' : '👤 عضو';
@@ -1265,12 +1430,9 @@
             } catch (error) {
                 console.error('Login error:', error);
                 showToast('حدث خطأ أثناء تسجيل الدخول', 'error');
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
             }
         }
-        
+
         // Logout Handler
         function handleLogout() {
             currentUser = null;
@@ -1280,13 +1442,8 @@
             document.getElementById('loginScreen').classList.remove('hidden');
             document.getElementById('loginName').value = '';
             document.getElementById('loginSpecialty').value = '';
-            
-            // Unsubscribe from real-time updates
-            if (unsubscribeFromUpdates) {
-                unsubscribeFromUpdates();
-            }
         }
-        
+
         // Show Main App
         function showMainApp() {
             document.getElementById('loginScreen').classList.add('hidden');
@@ -1313,7 +1470,7 @@
             
             navigateTo('home');
         }
-        
+
         // Navigation
         function navigateTo(page) {
             currentPage = page;
@@ -1345,7 +1502,7 @@
             
             updateUI();
         }
-        
+
         // Update UI
         function updateUI() {
             updateStats();
@@ -1358,21 +1515,19 @@
             updateCodes();
             updateSettings();
         }
-        
+
         // Update Stats
         function updateStats() {
-            const ideas = appData.filter(d => d.type === 'idea');
-            const users = appData.filter(d => d.type === 'user');
-            const totalViews = ideas.reduce((sum, i) => sum + (i.views || 0), 0);
-            const totalLikes = ideas.reduce((sum, i) => sum + (i.likes || 0), 0);
+            const totalViews = appData.ideas.reduce((sum, i) => sum + (i.views || 0), 0);
+            const totalLikes = appData.ideas.reduce((sum, i) => sum + (i.likes || 0), 0);
             
-            document.getElementById('totalIdeas').textContent = ideas.length;
+            document.getElementById('totalIdeas').textContent = appData.ideas.length;
             document.getElementById('totalViews').textContent = totalViews;
-            document.getElementById('totalMembers').textContent = users.length;
+            document.getElementById('totalMembers').textContent = appData.users.length;
             document.getElementById('totalInteractions').textContent = totalLikes;
             
             // Update suggestions badge
-            const pendingSuggestions = appData.filter(d => d.type === 'suggestion' && d.status === 'pending').length;
+            const pendingSuggestions = appData.suggestions.filter(s => s.status === 'pending').length;
             const badge = document.getElementById('suggestionsBadge');
             if (currentUser && currentUser.role === 'admin' && pendingSuggestions > 0) {
                 badge.textContent = pendingSuggestions;
@@ -1381,14 +1536,14 @@
                 badge.classList.add('hidden');
             }
         }
-        
+
         // Update Quote of Day
         function updateQuoteOfDay() {
             const dayIndex = new Date().getDate() % QUOTES.length;
             const quote = QUOTES[dayIndex];
             document.getElementById('quoteOfDay').textContent = `"${quote.text}" - ${quote.author}`;
         }
-        
+
         // Render Quotes
         function renderQuotes() {
             const grid = document.getElementById('quotesGrid');
@@ -1399,10 +1554,10 @@
                 </div>
             `).join('');
         }
-        
+
         // Update Latest Ideas
         function updateLatestIdeas() {
-            const ideas = appData.filter(d => d.type === 'idea').slice(0, 3);
+            const ideas = appData.ideas.slice(-3).reverse();
             const grid = document.getElementById('latestIdeasGrid');
             
             if (ideas.length === 0) {
@@ -1416,10 +1571,10 @@
             
             grid.innerHTML = ideas.map(idea => createIdeaCard(idea)).join('');
         }
-        
+
         // Update Ideas Grid
         function updateIdeasGrid() {
-            let ideas = appData.filter(d => d.type === 'idea');
+            let ideas = appData.ideas;
             
             if (currentFilter !== 'all') {
                 ideas = ideas.filter(i => i.category === currentFilter);
@@ -1438,9 +1593,9 @@
                 return;
             }
             
-            grid.innerHTML = ideas.map(idea => createIdeaCard(idea)).join('');
+            grid.innerHTML = ideas.reverse().map(idea => createIdeaCard(idea)).join('');
         }
-        
+
         // Create Idea Card
         function createIdeaCard(idea) {
             const icon = CATEGORY_ICONS[idea.category] || '💡';
@@ -1457,7 +1612,7 @@
                         ${idea.featured ? '<span class="text-yellow-400 text-xl">⭐</span>' : ''}
                     </div>
                     <h4 class="font-bold text-lg mb-2 line-clamp-2">${idea.title}</h4>
-                    <p class="text-gray-400 text-sm mb-4 line-clamp-3">${idea.content}</p>
+                    <p class="text-gray-400 text-sm mb-4 line-clamp-2">${idea.content}</p>
                     <div class="flex items-center justify-between text-sm">
                         <span class="text-gray-500 flex items-center gap-1">${roleIcon} ${idea.author}</span>
                         <div class="flex items-center gap-3">
@@ -1468,98 +1623,103 @@
                 </div>
             `;
         }
-        
+
         // View Idea
         async function viewIdea(id) {
-            const idea = appData.find(d => d.id === id);
+            const idea = appData.ideas.find(i => i.id === id);
             if (!idea) return;
             
-            // Increment views (only once per session)
-            if (!viewedIdeas.has(id)) {
-                viewedIdeas.add(id);
-                await dataSdk.update({
-                    ...idea,
-                    views: (idea.views || 0) + 1
-                });
-            }
-            
-            const likedBy = idea.likedBy ? idea.likedBy.split(',').filter(Boolean) : [];
-            const isLiked = currentUser && likedBy.includes(currentUser.name);
-            const comments = idea.comments ? JSON.parse(idea.comments) : [];
-            const icon = CATEGORY_ICONS[idea.category] || '💡';
-            
-            const roleIcons = { admin: '👑', premium: '💡', user: '👤' };
-            const roleIcon = roleIcons[idea.authorRole] || '👤';
-            
-            const formatDate = (dateStr) => {
-                const date = new Date(dateStr);
-                return date.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
-            };
-            
-            const content = document.getElementById('ideaDetailContent');
-            content.innerHTML = `
-                <div class="glass-card rounded-2xl p-8 mb-6">
-                    <div class="flex items-center gap-3 mb-4 flex-wrap">
-                        <span class="category-tag px-4 py-2 rounded-full">${icon} ${idea.category}</span>
-                        ${idea.featured ? '<span class="badge px-3 py-1 rounded-full text-sm">⭐ فكرة مميزة</span>' : ''}
-                    </div>
-                    <h2 class="text-3xl font-bold mb-4">${idea.title}</h2>
-                    <p class="text-gray-300 leading-relaxed text-lg mb-6 whitespace-pre-wrap">${idea.content}</p>
-                    <div class="flex items-center justify-between flex-wrap gap-4 border-t border-white/10 pt-4">
-                        <div class="flex items-center gap-4 flex-wrap">
-                            <span class="text-gray-400 flex items-center gap-1">${roleIcon} ${idea.author}</span>
-                            <span class="text-gray-400">📅 ${formatDate(idea.createdAt)}</span>
-                        </div>
-                        <div class="flex items-center gap-4">
-                            <span class="text-gray-400">👁️ ${idea.views || 0} مشاهدة</span>
-                            ${currentUser ? `
-                                <button onclick="toggleLike('${idea.id}')" class="flex items-center gap-2 ${isLiked ? 'text-red-400' : 'text-gray-400'} hover:text-red-400 transition-colors">
-                                    <span>${isLiked ? '❤️' : '🤍'}</span>
-                                    <span>${idea.likes || 0}</span>
-                                </button>
-                            ` : `<span class="text-gray-400">❤️ ${idea.likes || 0}</span>`}
-                            ${currentUser && currentUser.role === 'admin' ? `
-                                <button onclick="toggleFeature('${idea.id}')" class="text-yellow-400 hover:text-yellow-300 text-xl">
-                                    ${idea.featured ? '⭐' : '☆'}
-                                </button>
-                                <button onclick="deleteIdea('${idea.id}')" class="text-red-400 hover:text-red-300">🗑️</button>
-                            ` : ''}
-                        </div>
-                    </div>
-                </div>
+            try {
+                // Increment views (only once per session)
+                if (!viewedIdeas.has(id)) {
+                    viewedIdeas.add(id);
+                    await collections.ideas.doc(id).update({
+                        views: (idea.views || 0) + 1
+                    });
+                }
                 
-                <!-- Comments Section -->
-                <div class="glass-card rounded-2xl p-6">
-                    <h3 class="text-xl font-bold mb-4">💬 التعليقات (${comments.length})</h3>
-                    
-                    ${currentUser ? `
-                        <div class="flex gap-3 mb-6">
-                            <input type="text" id="commentInput" class="input-style flex-1 px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="اكتب تعليقاً..." maxlength="500">
-                            <button onclick="addComment('${idea.id}')" class="btn-primary px-6 py-3 rounded-xl">
-                                <span id="addCommentBtnText">إرسال</span>
-                                <div id="addCommentSpinner" class="loading-spinner hidden"></div>
-                            </button>
+                const likedBy = idea.likedBy ? idea.likedBy.split(',').filter(Boolean) : [];
+                const isLiked = currentUser && likedBy.includes(currentUser.name);
+                const comments = idea.comments ? JSON.parse(idea.comments) : [];
+                const icon = CATEGORY_ICONS[idea.category] || '💡';
+                
+                const roleIcons = { admin: '👑', premium: '💡', user: '👤' };
+                const roleIcon = roleIcons[idea.authorRole] || '👤';
+                
+                const formatDate = (dateStr) => {
+                    const date = new Date(dateStr);
+                    return date.toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
+                };
+                
+                const content = document.getElementById('ideaDetailContent');
+                content.innerHTML = `
+                    <div class="glass-card rounded-2xl p-8 mb-6">
+                        <div class="flex items-center gap-3 mb-4 flex-wrap">
+                            <span class="category-tag px-4 py-2 rounded-full">${icon} ${idea.category}</span>
+                            ${idea.featured ? '<span class="badge px-3 py-1 rounded-full text-sm">⭐ فكرة مميزة</span>' : ''}
                         </div>
-                    ` : '<p class="text-gray-400 mb-4 text-center">سجل الدخول لإضافة تعليق</p>'}
-                    
-                    <div class="space-y-4">
-                        ${comments.length === 0 ? '<p class="text-gray-500 text-center py-8">لا توجد تعليقات بعد. كن أول من يعلق!</p>' : ''}
-                        ${comments.reverse().map(c => `
-                            <div class="glass-card rounded-xl p-4">
-                                <div class="flex items-center justify-between mb-2">
-                                    <span class="font-bold">${c.author}</span>
-                                    <span class="text-gray-500 text-sm">${formatDate(c.date)}</span>
-                                </div>
-                                <p class="text-gray-300">${c.text}</p>
+                        <h2 class="text-3xl font-bold mb-4">${idea.title}</h2>
+                        <p class="text-gray-300 leading-relaxed text-lg mb-6 whitespace-pre-wrap">${idea.content}</p>
+                        <div class="flex items-center justify-between flex-wrap gap-4 border-t border-white/10 pt-4">
+                            <div class="flex items-center gap-4 flex-wrap">
+                                <span class="text-gray-400 flex items-center gap-1">${roleIcon} ${idea.author}</span>
+                                <span class="text-gray-400">📅 ${formatDate(idea.createdAt)}</span>
                             </div>
-                        `).join('')}
+                            <div class="flex items-center gap-4">
+                                <span class="text-gray-400">👁️ ${idea.views || 0} مشاهدة</span>
+                                ${currentUser ? `
+                                    <button onclick="toggleLike('${idea.id}')" class="flex items-center gap-2 ${isLiked ? 'text-red-400' : 'text-gray-400'} hover:text-red-400 transition-colors">
+                                        <span>${isLiked ? '❤️' : '🤍'}</span>
+                                        <span>${idea.likes || 0}</span>
+                                    </button>
+                                ` : `<span class="text-gray-400">❤️ ${idea.likes || 0}</span>`}
+                                ${currentUser && currentUser.role === 'admin' ? `
+                                    <button onclick="toggleFeature('${idea.id}')" class="text-yellow-400 hover:text-yellow-300 text-xl">
+                                        ${idea.featured ? '⭐' : '☆'}
+                                    </button>
+                                    <button onclick="deleteIdea('${idea.id}')" class="text-red-400 hover:text-red-300">🗑️</button>
+                                ` : ''}
+                            </div>
+                        </div>
                     </div>
-                </div>
-            `;
-            
-            navigateTo('ideaDetail');
+                    
+                    <!-- Comments Section -->
+                    <div class="glass-card rounded-2xl p-6">
+                        <h3 class="text-xl font-bold mb-4">💬 التعليقات (${comments.length})</h3>
+                        
+                        ${currentUser ? `
+                            <div class="flex gap-3 mb-6">
+                                <input type="text" id="commentInput" class="input-style flex-1 px-4 py-3 rounded-xl text-white placeholder-gray-400" placeholder="اكتب تعليقاً..." maxlength="500">
+                                <button onclick="addComment('${idea.id}')" class="btn-primary px-6 py-3 rounded-xl">
+                                    <span id="addCommentBtnText">إرسال</span>
+                                    <div id="addCommentSpinner" class="loading-spinner hidden"></div>
+                                </button>
+                            </div>
+                        ` : '<p class="text-gray-400 mb-4 text-center">سجل الدخول لإضافة تعليق</p>'}
+                        
+                        <div class="space-y-4">
+                            ${comments.length === 0 ? '<p class="text-gray-500 text-center py-8">لا توجد تعليقات بعد. كن أول من يعلق!</p>' : ''}
+                            ${comments.reverse().map(c => `
+                                <div class="glass-card rounded-xl p-4">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="font-bold">${c.author}</span>
+                                        <span class="text-gray-500 text-sm">${formatDate(c.date)}</span>
+                                    </div>
+                                    <p class="text-gray-300">${c.text}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                
+                navigateTo('ideaDetail');
+                
+            } catch (error) {
+                console.error('Error viewing idea:', error);
+                showToast('خطأ في تحميل الفكرة', 'error');
+            }
         }
-        
+
         // Toggle Like
         async function toggleLike(id) {
             if (!currentUser) {
@@ -1567,37 +1727,37 @@
                 return;
             }
             
-            const idea = appData.find(d => d.id === id);
-            if (!idea) return;
-            
-            const likedBy = idea.likedBy ? idea.likedBy.split(',').filter(Boolean) : [];
-            const isLiked = likedBy.includes(currentUser.name);
-            
-            if (isLiked) {
-                const newLikedBy = likedBy.filter(n => n !== currentUser.name);
-                const result = await dataSdk.update({
-                    ...idea,
-                    likes: Math.max(0, (idea.likes || 0) - 1),
-                    likedBy: newLikedBy.join(',')
-                });
-                if (result.isOk) {
+            try {
+                const idea = appData.ideas.find(i => i.id === id);
+                if (!idea) return;
+                
+                const likedBy = idea.likedBy ? idea.likedBy.split(',').filter(Boolean) : [];
+                const isLiked = likedBy.includes(currentUser.name);
+                
+                if (isLiked) {
+                    const newLikedBy = likedBy.filter(n => n !== currentUser.name);
+                    await collections.ideas.doc(id).update({
+                        likes: Math.max(0, (idea.likes || 0) - 1),
+                        likedBy: newLikedBy.join(',')
+                    });
                     showToast('تم إلغاء الإعجاب', 'info');
-                }
-            } else {
-                likedBy.push(currentUser.name);
-                const result = await dataSdk.update({
-                    ...idea,
-                    likes: (idea.likes || 0) + 1,
-                    likedBy: likedBy.join(',')
-                });
-                if (result.isOk) {
+                } else {
+                    likedBy.push(currentUser.name);
+                    await collections.ideas.doc(id).update({
+                        likes: (idea.likes || 0) + 1,
+                        likedBy: likedBy.join(',')
+                    });
                     showToast('أعجبك هذا! ❤️', 'success');
                 }
+                
+                viewIdea(id);
+                
+            } catch (error) {
+                console.error('Error toggling like:', error);
+                showToast('خطأ في تحديث الإعجاب', 'error');
             }
-            
-            viewIdea(id);
         }
-        
+
         // Add Comment
         async function addComment(id) {
             if (!currentUser) {
@@ -1624,66 +1784,70 @@
             btnText.classList.add('hidden');
             spinner.classList.remove('hidden');
             
-            const idea = appData.find(d => d.id === id);
-            if (!idea) {
-                btnText.classList.remove('hidden');
-                spinner.classList.add('hidden');
-                return;
-            }
-            
-            const comments = idea.comments ? JSON.parse(idea.comments) : [];
-            comments.push({
-                author: currentUser.name,
-                text,
-                date: new Date().toISOString()
-            });
-            
-            const result = await dataSdk.update({
-                ...idea,
-                comments: JSON.stringify(comments)
-            });
-            
-            if (result.isOk) {
+            try {
+                const idea = appData.ideas.find(i => i.id === id);
+                if (!idea) {
+                    btnText.classList.remove('hidden');
+                    spinner.classList.add('hidden');
+                    return;
+                }
+                
+                const comments = idea.comments ? JSON.parse(idea.comments) : [];
+                comments.push({
+                    author: currentUser.name,
+                    text,
+                    date: new Date().toISOString()
+                });
+                
+                await collections.ideas.doc(id).update({
+                    comments: JSON.stringify(comments)
+                });
+                
                 showToast('تم إضافة التعليق بنجاح! 💬', 'success');
                 viewIdea(id);
-            } else {
+                
+            } catch (error) {
+                console.error('Error adding comment:', error);
                 showToast('فشل إضافة التعليق', 'error');
                 btnText.classList.remove('hidden');
                 spinner.classList.add('hidden');
             }
         }
-        
+
         // Toggle Feature
         async function toggleFeature(id) {
-            const idea = appData.find(d => d.id === id);
-            if (!idea) return;
-            
-            const result = await dataSdk.update({
-                ...idea,
-                featured: !idea.featured
-            });
-            
-            if (result.isOk) {
+            try {
+                const idea = appData.ideas.find(i => i.id === id);
+                if (!idea) return;
+                
+                await collections.ideas.doc(id).update({
+                    featured: !idea.featured
+                });
+                
                 showToast(idea.featured ? 'تم إلغاء التمييز' : 'تم تمييز الفكرة ⭐', 'success');
                 viewIdea(id);
+                
+            } catch (error) {
+                console.error('Error toggling feature:', error);
+                showToast('خطأ في تحديث الفكرة', 'error');
             }
         }
-        
+
         // Delete Idea
         function deleteIdea(id) {
             confirmAction = async () => {
-                const idea = appData.find(d => d.id === id);
-                if (idea) {
-                    const result = await dataSdk.delete(idea);
-                    if (result.isOk) {
-                        showToast('تم حذف الفكرة بنجاح', 'success');
-                        navigateTo('ideas');
-                    }
+                try {
+                    await collections.ideas.doc(id).delete();
+                    showToast('تم حذف الفكرة بنجاح', 'success');
+                    navigateTo('ideas');
+                } catch (error) {
+                    console.error('Error deleting idea:', error);
+                    showToast('خطأ في حذف الفكرة', 'error');
                 }
             };
             showConfirmModal('حذف الفكرة', 'هل أنت متأكد من حذف هذه الفكرة؟ لا يمكن التراجع عن هذا الإجراء.');
         }
-        
+
         // Filter Ideas
         function filterIdeas(filter) {
             currentFilter = filter;
@@ -1697,7 +1861,7 @@
             
             updateIdeasGrid();
         }
-        
+
         // Open Add Idea Modal
         function openAddIdeaModal() {
             if (currentUser && (currentUser.role === 'admin' || currentUser.role === 'premium')) {
@@ -1707,7 +1871,7 @@
                 showToast('لا تملك صلاحية إضافة أفكار. استخدم رمز ترقية لتصبح عضواً مميزاً.', 'error');
             }
         }
-        
+
         // Submit Idea
         async function submitIdea() {
             const title = document.getElementById('ideaTitle').value.trim();
@@ -1736,7 +1900,7 @@
             spinner.classList.remove('hidden');
             
             try {
-                const result = await dataSdk.create({
+                const ideaData = {
                     type: 'idea',
                     title,
                     category,
@@ -1749,31 +1913,29 @@
                     comments: '[]',
                     featured: false,
                     createdAt: new Date().toISOString()
-                });
+                };
                 
-                if (result.isOk) {
-                    closeModal('addIdeaModal');
-                    document.getElementById('ideaTitle').value = '';
-                    document.getElementById('ideaContent').value = '';
-                    showToast('تم نشر الفكرة بنجاح! 💡', 'success');
-                } else {
-                    showToast('فشل نشر الفكرة. حاول مرة أخرى.', 'error');
-                }
+                await collections.ideas.add(ideaData);
+                
+                closeModal('addIdeaModal');
+                document.getElementById('ideaTitle').value = '';
+                document.getElementById('ideaContent').value = '';
+                showToast('تم نشر الفكرة بنجاح! 💡', 'success');
+                
             } catch (error) {
                 console.error('Error submitting idea:', error);
-                showToast('حدث خطأ أثناء نشر الفكرة', 'error');
+                showToast('فشل نشر الفكرة. حاول مرة أخرى.', 'error');
             } finally {
                 btnText.classList.remove('hidden');
                 spinner.classList.add('hidden');
             }
         }
-        
+
         // Update Content Grid
         function updateContentGrid() {
-            const contents = appData.filter(d => d.type === 'content');
             const grid = document.getElementById('contentGrid');
             
-            if (contents.length === 0) {
+            if (appData.content.length === 0) {
                 grid.innerHTML = `
                     <div class="glass-card rounded-xl p-6 text-center text-gray-400 col-span-full">
                         <p class="text-5xl mb-4">📚</p>
@@ -1784,10 +1946,10 @@
                 return;
             }
             
-            grid.innerHTML = contents.map(c => `
+            grid.innerHTML = appData.content.reverse().map(c => `
                 <div class="glass-card rounded-xl p-6 card-hover">
                     <h4 class="font-bold text-xl mb-3">${c.title}</h4>
-                    <p class="text-gray-300 leading-relaxed whitespace-pre-wrap line-clamp-6">${c.content}</p>
+                    <p class="text-gray-300 leading-relaxed whitespace-pre-wrap">${c.content}</p>
                     <div class="mt-4 flex items-center justify-between text-sm text-gray-500">
                         <span>✍️ ${c.author}</span>
                         ${currentUser && currentUser.role === 'admin' ? `
@@ -1797,7 +1959,7 @@
                 </div>
             `).join('');
         }
-        
+
         // Open Add Content Modal
         function openAddContentModal() {
             if (currentUser && currentUser.role === 'admin') {
@@ -1805,7 +1967,7 @@
                 document.getElementById('contentTitle').focus();
             }
         }
-        
+
         // Submit Content
         async function submitContent() {
             const title = document.getElementById('contentTitle').value.trim();
@@ -1823,51 +1985,49 @@
             spinner.classList.remove('hidden');
             
             try {
-                const result = await dataSdk.create({
+                const contentData = {
                     type: 'content',
                     title,
                     content,
                     author: currentUser.name,
                     createdAt: new Date().toISOString()
-                });
+                };
                 
-                if (result.isOk) {
-                    closeModal('addContentModal');
-                    document.getElementById('contentTitle').value = '';
-                    document.getElementById('contentText').value = '';
-                    showToast('تم نشر المحتوى بنجاح! 📚', 'success');
-                } else {
-                    showToast('فشل نشر المحتوى', 'error');
-                }
+                await collections.content.add(contentData);
+                
+                closeModal('addContentModal');
+                document.getElementById('contentTitle').value = '';
+                document.getElementById('contentText').value = '';
+                showToast('تم نشر المحتوى بنجاح! 📚', 'success');
+                
             } catch (error) {
                 console.error('Error submitting content:', error);
-                showToast('حدث خطأ أثناء نشر المحتوى', 'error');
+                showToast('فشل نشر المحتوى', 'error');
             } finally {
                 btnText.classList.remove('hidden');
                 spinner.classList.add('hidden');
             }
         }
-        
+
         // Delete Content
         function deleteContent(id) {
             confirmAction = async () => {
-                const content = appData.find(d => d.id === id);
-                if (content) {
-                    const result = await dataSdk.delete(content);
-                    if (result.isOk) {
-                        showToast('تم حذف المحتوى بنجاح', 'success');
-                    }
+                try {
+                    await collections.content.doc(id).delete();
+                    showToast('تم حذف المحتوى بنجاح', 'success');
+                } catch (error) {
+                    console.error('Error deleting content:', error);
+                    showToast('خطأ في حذف المحتوى', 'error');
                 }
             };
             showConfirmModal('حذف المحتوى', 'هل أنت متأكد من حذف هذا المحتوى؟');
         }
-        
+
         // Update Suggestions
         function updateSuggestions() {
-            const suggestions = appData.filter(d => d.type === 'suggestion');
             const list = document.getElementById('suggestionsList');
             
-            if (suggestions.length === 0) {
+            if (appData.suggestions.length === 0) {
                 list.innerHTML = `
                     <div class="glass-card rounded-xl p-6 text-center text-gray-400">
                         <p class="text-5xl mb-4">💡</p>
@@ -1878,7 +2038,7 @@
                 return;
             }
             
-            list.innerHTML = suggestions.map(s => {
+            list.innerHTML = appData.suggestions.reverse().map(s => {
                 const statusColors = {
                     pending: 'text-yellow-400',
                     approved: 'text-green-400',
@@ -1897,7 +2057,7 @@
                             <span class="${statusColors[s.status] || 'text-gray-400'} text-sm font-bold">${statusText[s.status] || s.status}</span>
                         </div>
                         <h4 class="font-bold mb-2">${s.title}</h4>
-                        <p class="text-gray-400 text-sm mb-3 line-clamp-3">${s.content}</p>
+                        <p class="text-gray-400 text-sm mb-3">${s.content}</p>
                         <div class="flex items-center justify-between text-sm flex-wrap gap-2">
                             <span class="text-gray-500">من: ${s.author}</span>
                             ${currentUser && currentUser.role === 'admin' && s.status === 'pending' ? `
@@ -1911,7 +2071,7 @@
                 `;
             }).join('');
         }
-        
+
         // Submit Suggestion
         async function submitSuggestion() {
             if (!currentUser) {
@@ -1935,7 +2095,7 @@
             spinner.classList.remove('hidden');
             
             try {
-                const result = await dataSdk.create({
+                const suggestionData = {
                     type: 'suggestion',
                     suggestionType: type,
                     title,
@@ -1943,42 +2103,43 @@
                     author: currentUser.name,
                     status: 'pending',
                     createdAt: new Date().toISOString()
-                });
+                };
                 
-                if (result.isOk) {
-                    document.getElementById('suggestionTitle').value = '';
-                    document.getElementById('suggestionContent').value = '';
-                    showToast('تم إرسال اقتراحك! شكراً لمساهمتك 📝', 'success');
-                } else {
-                    showToast('فشل إرسال الاقتراح', 'error');
-                }
+                await collections.suggestions.add(suggestionData);
+                
+                document.getElementById('suggestionTitle').value = '';
+                document.getElementById('suggestionContent').value = '';
+                showToast('تم إرسال اقتراحك! شكراً لمساهمتك 📝', 'success');
+                
             } catch (error) {
                 console.error('Error submitting suggestion:', error);
-                showToast('حدث خطأ أثناء إرسال الاقتراح', 'error');
+                showToast('فشل إرسال الاقتراح', 'error');
             } finally {
                 btnText.classList.remove('hidden');
                 spinner.classList.add('hidden');
             }
         }
-        
+
         // Update Suggestion Status
         async function updateSuggestionStatus(id, status) {
-            const suggestion = appData.find(d => d.id === id);
-            if (suggestion) {
-                const result = await dataSdk.update({
-                    ...suggestion,
+            try {
+                await collections.suggestions.doc(id).update({
                     status
                 });
                 
-                if (result.isOk) {
-                    showToast(`تم ${status === 'approved' ? 'قبول ✅' : 'رفض ❌'} الاقتراح`, 'success');
-                }
+                showToast(`تم ${status === 'approved' ? 'قبول ✅' : 'رفض ❌'} الاقتراح`, 'success');
+                
+            } catch (error) {
+                console.error('Error updating suggestion status:', error);
+                showToast('خطأ في تحديث حالة الاقتراح', 'error');
             }
         }
-        
+
         // Update Members
         function updateMembers() {
-            const users = appData.filter(d => d.type === 'user');
+            const users = [...appData.users].sort((a, b) => 
+                new Date(a.createdAt) - new Date(b.createdAt)
+            );
             
             const adminUsers = users.filter(u => u.role === 'admin');
             const premiumUsers = users.filter(u => u.role === 'premium');
@@ -2002,7 +2163,7 @@
                             <span class="text-3xl">👑</span>
                             <div>
                                 <p class="font-bold flex items-center gap-2">
-                                    ${u.title}
+                                    ${u.name}
                                     <span class="role-badge role-admin">مدير</span>
                                 </p>
                                 <p class="text-sm text-gray-400">${u.specialty}</p>
@@ -2022,7 +2183,7 @@
                             <span class="text-2xl">💡</span>
                             <div>
                                 <p class="font-bold flex items-center gap-2">
-                                    ${u.title}
+                                    ${u.name}
                                     <span class="role-badge role-premium">مميز</span>
                                 </p>
                                 <p class="text-sm text-gray-400">${u.specialty}</p>
@@ -2030,7 +2191,7 @@
                                 <p class="text-xs text-gray-500">انضم في ${formatDate(u.createdAt)}</p>
                             </div>
                         </div>
-                        ${currentUser && currentUser.role === 'admin' && u.title !== currentUser.name ? `
+                        ${currentUser && currentUser.role === 'admin' && u.name !== currentUser.name ? `
                             <button onclick="deleteMember('${u.id}')" class="text-red-400 hover:text-red-300">🗑️</button>
                         ` : ''}
                     </div>
@@ -2046,7 +2207,7 @@
                             <span class="text-2xl">👤</span>
                             <div>
                                 <p class="font-bold flex items-center gap-2">
-                                    ${u.title}
+                                    ${u.name}
                                     <span class="role-badge role-user">عادي</span>
                                 </p>
                                 <p class="text-sm text-gray-400">${u.specialty}</p>
@@ -2060,27 +2221,26 @@
                 `).join('');
             }
         }
-        
+
         // Delete Member
         function deleteMember(id) {
             confirmAction = async () => {
-                const member = appData.find(d => d.id === id);
-                if (member) {
-                    const result = await dataSdk.delete(member);
-                    if (result.isOk) {
-                        showToast('تم حذف العضو بنجاح', 'success');
-                    }
+                try {
+                    await collections.users.doc(id).delete();
+                    showToast('تم حذف العضو بنجاح', 'success');
+                } catch (error) {
+                    console.error('Error deleting member:', error);
+                    showToast('خطأ في حذف العضو', 'error');
                 }
             };
             showConfirmModal('حذف العضو', 'هل أنت متأكد من حذف هذا العضو؟ سيتم حذف جميع بياناته.');
         }
-        
+
         // Update Codes
         function updateCodes() {
-            const codes = appData.filter(d => d.type === 'code');
             const list = document.getElementById('codesList');
             
-            if (codes.length === 0) {
+            if (appData.codes.length === 0) {
                 list.innerHTML = '<p class="text-gray-400 text-center">لا توجد رموز</p>';
                 return;
             }
@@ -2090,7 +2250,7 @@
                 return date.toLocaleDateString('ar-EG', { year: 'numeric', month: 'short', day: 'numeric' });
             };
             
-            list.innerHTML = codes.map(c => `
+            list.innerHTML = appData.codes.reverse().map(c => `
                 <div class="glass-card rounded-xl p-4 flex items-center justify-between">
                     <div class="flex items-center gap-3">
                         <span class="text-2xl">${c.usedBy ? '✅' : '🎫'}</span>
@@ -2108,14 +2268,9 @@
                 </div>
             `).join('');
         }
-        
+
         // Generate Code
         async function generateCode() {
-            if (currentUser && currentUser.role !== 'admin') {
-                showToast('لا تملك صلاحية إنشاء رموز', 'error');
-                return;
-            }
-            
             const input = document.getElementById('newCodeInput');
             let code = input.value.trim();
             
@@ -2124,70 +2279,66 @@
             }
             
             // Check if code exists
-            const existingCode = appData.find(d => d.type === 'code' && d.code === code);
+            const existingCode = appData.codes.find(c => c.code === code);
             if (existingCode) {
                 showToast('هذا الرمز موجود بالفعل', 'error');
                 return;
             }
             
             try {
-                const result = await dataSdk.create({
-                    type: 'code',
+                const codeData = {
                     code,
                     usedBy: '',
                     usedAt: '',
                     createdAt: new Date().toISOString()
-                });
+                };
                 
-                if (result.isOk) {
-                    input.value = '';
-                    showToast(`تم إنشاء الرمز: ${code} 🎫`, 'success');
-                }
+                await collections.codes.add(codeData);
+                
+                input.value = '';
+                showToast(`تم إنشاء الرمز: ${code} 🎫`, 'success');
+                
             } catch (error) {
                 console.error('Error generating code:', error);
-                showToast('حدث خطأ أثناء إنشاء الرمز', 'error');
+                showToast('خطأ في إنشاء الرمز', 'error');
             }
         }
-        
+
         // Delete Code
         function deleteCode(id) {
             confirmAction = async () => {
-                const code = appData.find(d => d.id === id);
-                if (code) {
-                    const result = await dataSdk.delete(code);
-                    if (result.isOk) {
-                        showToast('تم حذف الرمز بنجاح', 'success');
-                    }
+                try {
+                    await collections.codes.doc(id).delete();
+                    showToast('تم حذف الرمز بنجاح', 'success');
+                } catch (error) {
+                    console.error('Error deleting code:', error);
+                    showToast('خطأ في حذف الرمز', 'error');
                 }
             };
             showConfirmModal('حذف الرمز', 'هل أنت متأكد من حذف هذا الرمز؟');
         }
-        
+
         // Update Settings
         function updateSettings() {
-            const ideas = appData.filter(d => d.type === 'idea');
-            const users = appData.filter(d => d.type === 'user');
-            const suggestions = appData.filter(d => d.type === 'suggestion' && d.status === 'pending');
-            const codes = appData.filter(d => d.type === 'code' && !d.usedBy);
+            const pendingSuggestions = appData.suggestions.filter(s => s.status === 'pending');
+            const activeCodes = appData.codes.filter(c => !c.usedBy);
             
-            document.getElementById('settingsIdeasCount').textContent = ideas.length;
-            document.getElementById('settingsMembersCount').textContent = users.length;
-            document.getElementById('settingsSuggestionsCount').textContent = suggestions.length;
-            document.getElementById('settingsCodesCount').textContent = codes.length;
+            document.getElementById('settingsIdeasCount').textContent = appData.ideas.length;
+            document.getElementById('settingsMembersCount').textContent = appData.users.length;
+            document.getElementById('settingsSuggestionsCount').textContent = pendingSuggestions.length;
+            document.getElementById('settingsCodesCount').textContent = activeCodes.length;
         }
-        
+
         // Export Data
         async function exportData() {
             try {
                 const dataToExport = {
-                    timestamp: new Date().toISOString(),
-                    data: appData,
-                    stats: {
-                        ideas: appData.filter(d => d.type === 'idea').length,
-                        users: appData.filter(d => d.type === 'user').length,
-                        suggestions: appData.filter(d => d.type === 'suggestion').length,
-                        codes: appData.filter(d => d.type === 'code').length
-                    }
+                    users: appData.users,
+                    ideas: appData.ideas,
+                    content: appData.content,
+                    suggestions: appData.suggestions,
+                    codes: appData.codes,
+                    exportDate: new Date().toISOString()
                 };
                 
                 const dataStr = JSON.stringify(dataToExport, null, 2);
@@ -2201,49 +2352,61 @@
                 showToast('تم تصدير البيانات بنجاح 📥', 'success');
             } catch (error) {
                 console.error('Error exporting data:', error);
-                showToast('حدث خطأ أثناء تصدير البيانات', 'error');
+                showToast('خطأ في تصدير البيانات', 'error');
             }
         }
-        
+
         // Confirm Clear Data
         function confirmClearData() {
-            if (currentUser && currentUser.role !== 'admin') {
-                showToast('لا تملك صلاحية حذف البيانات', 'error');
-                return;
-            }
-            
             confirmAction = async () => {
                 try {
-                    // Delete all data from Firestore
-                    const batch = db.batch();
-                    const snapshot = await db.collection('museumData').get();
+                    // Delete all documents from all collections
+                    const deletePromises = [];
                     
-                    snapshot.docs.forEach(doc => {
-                        batch.delete(doc.ref);
+                    // Delete all ideas
+                    appData.ideas.forEach(idea => {
+                        deletePromises.push(collections.ideas.doc(idea.id).delete());
                     });
                     
-                    await batch.commit();
+                    // Delete all content
+                    appData.content.forEach(content => {
+                        deletePromises.push(collections.content.doc(content.id).delete());
+                    });
                     
-                    // Clear local data
-                    appData = [];
-                    dataHandler.onDataChanged(appData);
+                    // Delete all suggestions
+                    appData.suggestions.forEach(suggestion => {
+                        deletePromises.push(collections.suggestions.doc(suggestion.id).delete());
+                    });
                     
-                    showToast('تم حذف جميع البيانات بنجاح', 'success');
+                    // Delete all codes
+                    appData.codes.forEach(code => {
+                        deletePromises.push(collections.codes.doc(code.id).delete());
+                    });
+                    
+                    // Delete all users except current user
+                    appData.users.forEach(user => {
+                        if (user.id !== currentUser.id) {
+                            deletePromises.push(collections.users.doc(user.id).delete());
+                        }
+                    });
+                    
+                    await Promise.all(deletePromises);
+                    showToast('تم حذف جميع البيانات', 'success');
                 } catch (error) {
                     console.error('Error clearing data:', error);
-                    showToast('حدث خطأ أثناء حذف البيانات', 'error');
+                    showToast('خطأ في حذف البيانات', 'error');
                 }
             };
             showConfirmModal('حذف جميع البيانات', 'هل أنت متأكد من حذف جميع البيانات؟ هذا الإجراء لا يمكن التراجع عنه!');
         }
-        
+
         // Show Confirm Modal
         function showConfirmModal(title, message) {
             document.getElementById('confirmTitle').textContent = title;
             document.getElementById('confirmMessage').textContent = message;
             document.getElementById('confirmModal').classList.remove('hidden');
         }
-        
+
         // Execute Confirmed Action
         async function executeConfirmedAction() {
             if (confirmAction) {
@@ -2252,12 +2415,12 @@
             }
             closeModal('confirmModal');
         }
-        
+
         // Close Modal
         function closeModal(modalId) {
             document.getElementById(modalId).classList.add('hidden');
         }
-        
+
         // Show Toast
         function showToast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
@@ -2284,8 +2447,8 @@
                 setTimeout(() => toast.remove(), 300);
             }, 4000);
         }
-        
-        // Initialize App
+
+        // Initialize the app when DOM is loaded
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
