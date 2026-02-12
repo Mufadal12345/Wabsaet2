@@ -1,0 +1,7 @@
+{
+  "name": "Valentine's Digital Gift",
+  "description": "An interactive, romantic Valentine's Day web experience featuring custom messages, a flower gallery, animated stickers, and a magical gift reveal.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
